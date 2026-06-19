@@ -30,12 +30,6 @@
         .logo { padding: 0 20px 20px; font-size: 22px; font-weight: 800; color: white; border-bottom: 1px solid #374151; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; } .logo span { color: var(--primary); }
         .nav-link { display: flex; align-items: center; padding: 12px 20px; color: var(--sidebar-text); text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
         .nav-link:hover { background: #374151; color: white; } .nav-link.active { background: #374151; color: white; border-left-color: var(--primary); } .nav-link .icon { margin-right: 12px; font-size: 16px; width: 20px; text-align: center; }
-        
-        /* NEW PRO BUTTON STYLES */
-        .pro-section { padding: 20px; border-top: 1px solid #374151; margin-top: 15px; }
-        .pro-btn { display: block; width: 100%; padding: 12px; background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; text-align: center; text-decoration: none; margin-bottom: 8px; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); transition: transform 0.2s; }
-        .pro-btn:hover { transform: translateY(-2px); }
-        .pro-text { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
 
         .sidebar-bottom { padding: 20px; border-top: 1px solid #374151; display: flex; align-items: center; gap: 12px; }
         .avatar-circle { width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
@@ -104,13 +98,6 @@
             <div class="nav-link" onclick="navigate('glue')"><span class="icon">🔗</span> Paragraph Glue</div>
             <div class="nav-link" onclick="navigate('pomodoro')"><span class="icon">⏱️</span> Writing Sprinter</div>
             <div class="nav-link" onclick="navigate('flashcards')"><span class="icon">🃏</span> Grammar Flashcards</div>
-            
-            <!-- NEW PRO SUBSCRIPTION SECTION -->
-            <div class="pro-section">
-                <a href="PASTE_YOUR_GUMROAD_LINK_HERE" class="pro-btn">🔥 Unlock Pro Tools - $7/mo</a>
-                <div class="pro-text">Get the Anti-AI Checker & Ivy League Templates</div>
-            </div>
-
         </div>
         <div class="sidebar-bottom">
             <div class="avatar-circle" id="avatarCircle">U</div>
@@ -158,7 +145,7 @@
     // 1. FIREBASE GOOGLE AUTH SETUP
     // ==========================================
     const firebaseConfig = {
-        apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
+  apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
   authDomain: "lexisute.firebaseapp.com",
   projectId: "lexisute",
   storageBucket: "lexisute.firebasestorage.app",
