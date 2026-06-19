@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LexiSuite - The Student Writing OS</title>
     
-    <!-- FIREBASE SDKS (DO NOT DELETE) -->
+    <!-- FIREBASE SDKS -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
@@ -30,6 +30,13 @@
         .logo { padding: 0 20px 20px; font-size: 22px; font-weight: 800; color: white; border-bottom: 1px solid #374151; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; } .logo span { color: var(--primary); }
         .nav-link { display: flex; align-items: center; padding: 12px 20px; color: var(--sidebar-text); text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
         .nav-link:hover { background: #374151; color: white; } .nav-link.active { background: #374151; color: white; border-left-color: var(--primary); } .nav-link .icon { margin-right: 12px; font-size: 16px; width: 20px; text-align: center; }
+        
+        /* NEW PRO BUTTON STYLES */
+        .pro-section { padding: 20px; border-top: 1px solid #374151; margin-top: 15px; }
+        .pro-btn { display: block; width: 100%; padding: 12px; background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; text-align: center; text-decoration: none; margin-bottom: 8px; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); transition: transform 0.2s; }
+        .pro-btn:hover { transform: translateY(-2px); }
+        .pro-text { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
+
         .sidebar-bottom { padding: 20px; border-top: 1px solid #374151; display: flex; align-items: center; gap: 12px; }
         .avatar-circle { width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
         .user-info { flex: 1; overflow: hidden; } .user-name { font-size: 14px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -97,6 +104,13 @@
             <div class="nav-link" onclick="navigate('glue')"><span class="icon">🔗</span> Paragraph Glue</div>
             <div class="nav-link" onclick="navigate('pomodoro')"><span class="icon">⏱️</span> Writing Sprinter</div>
             <div class="nav-link" onclick="navigate('flashcards')"><span class="icon">🃏</span> Grammar Flashcards</div>
+            
+            <!-- NEW PRO SUBSCRIPTION SECTION -->
+            <div class="pro-section">
+                <a href="PASTE_YOUR_GUMROAD_LINK_HERE" class="pro-btn">🔥 Unlock Pro Tools - $7/mo</a>
+                <div class="pro-text">Get the Anti-AI Checker & Ivy League Templates</div>
+            </div>
+
         </div>
         <div class="sidebar-bottom">
             <div class="avatar-circle" id="avatarCircle">U</div>
@@ -143,10 +157,8 @@
     // ==========================================
     // 1. FIREBASE GOOGLE AUTH SETUP
     // ==========================================
-    
-    /* PASTE YOUR FIREBASE CONFIG HERE */
     const firebaseConfig = {
-      apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
+        apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
   authDomain: "lexisute.firebaseapp.com",
   projectId: "lexisute",
   storageBucket: "lexisute.firebasestorage.app",
@@ -168,62 +180,17 @@
             const userData = { name: user.displayName, email: user.email };
             localStorage.setItem('lexiCurrentUser', JSON.stringify(userData));
             showApp();
-        }).catch((error) => {
-            alert("Login failed: " + error.message);
-        });
+        }).catch((error) => { alert("Login failed: " + error.message); });
     }
 
-    function signupUser() { 
-        const n = document.getElementById('signupName').value.trim(); 
-        const e = document.getElementById('signupEmail').value.trim(); 
-        const p = document.getElementById('signupPass').value; 
-        if(!n || !e || p.length < 6) return alert("Fill all fields (Password min 6 chars)."); 
-        let u = JSON.parse(localStorage.getItem('lexiUsers') || '{}'); 
-        if(u[e]) return alert("Account exists."); 
-        u[e] = { name: n, pass: p }; 
-        localStorage.setItem('lexiUsers', JSON.stringify(u)); 
-        localStorage.setItem('lexiCurrentUser', JSON.stringify({name: n, email: e})); 
-        showApp(); 
-    }
-
-    function loginUser() { 
-        const e = document.getElementById('loginEmail').value.trim(); 
-        const p = document.getElementById('loginPass').value; 
-        let u = JSON.parse(localStorage.getItem('lexiUsers') || '{}'); 
-        if(!u[e] || u[e].pass !== p) return alert("Wrong email or password."); 
-        localStorage.setItem('lexiCurrentUser', JSON.stringify({name: u[e].name, email: e})); 
-        showApp(); 
-    }
-
-    function logoutUser() { 
-        auth.signOut();
-        localStorage.removeItem('lexiCurrentUser'); 
-        document.getElementById('authScreen').style.display = 'flex'; 
-        document.getElementById('appContainer').style.display = 'none'; 
-        showLogin(); 
-    }
-
-    function showApp() { 
-        let u = JSON.parse(localStorage.getItem('lexiCurrentUser')); 
-        document.getElementById('authScreen').style.display = 'none'; 
-        document.getElementById('appContainer').style.display = 'block'; 
-        document.getElementById('displayName').innerText = u.name; 
-        document.getElementById('displayEmail').innerText = u.email; 
-        document.getElementById('avatarCircle').innerText = u.name.charAt(0).toUpperCase(); 
-    }
-
-    // Auto-login check
-    if(localStorage.getItem('lexiCurrentUser')) { showApp(); }
-    auth.onAuthStateChanged((user) => {
-        if (user && !localStorage.getItem('lexiCurrentUser')) {
-            const userData = { name: user.displayName, email: user.email };
-            localStorage.setItem('lexiCurrentUser', JSON.stringify(userData));
-            showApp();
-        }
-    });
+    function signupUser() { const n = document.getElementById('signupName').value.trim(); const e = document.getElementById('signupEmail').value.trim(); const p = document.getElementById('signupPass').value; if(!n || !e || p.length < 6) return alert("Fill all fields (Password min 6 chars)."); let u = JSON.parse(localStorage.getItem('lexiUsers') || '{}'); if(u[e]) return alert("Account exists."); u[e] = { name: n, pass: p }; localStorage.setItem('lexiUsers', JSON.stringify(u)); localStorage.setItem('lexiCurrentUser', JSON.stringify({name: n, email: e})); showApp(); }
+    function loginUser() { const e = document.getElementById('loginEmail').value.trim(); const p = document.getElementById('loginPass').value; let u = JSON.parse(localStorage.getItem('lexiUsers') || '{}'); if(!u[e] || u[e].pass !== p) return alert("Wrong email or password."); localStorage.setItem('lexiCurrentUser', JSON.stringify({name: u[e].name, email: e})); showApp(); }
+    function logoutUser() { auth.signOut(); localStorage.removeItem('lexiCurrentUser'); document.getElementById('authScreen').style.display = 'flex'; document.getElementById('appContainer').style.display = 'none'; showLogin(); }
+    function showApp() { let u = JSON.parse(localStorage.getItem('lexiCurrentUser')); document.getElementById('authScreen').style.display = 'none'; document.getElementById('appContainer').style.display = 'block'; document.getElementById('displayName').innerText = u.name; document.getElementById('displayEmail').innerText = u.email; document.getElementById('avatarCircle').innerText = u.name.charAt(0).toUpperCase(); }
+    if(localStorage.getItem('lexiCurrentUser')) { showApp(); } auth.onAuthStateChanged((user) => { if (user && !localStorage.getItem('lexiCurrentUser')) { const userData = { name: user.displayName, email: user.email }; localStorage.setItem('lexiCurrentUser', JSON.stringify(userData)); showApp(); } });
 
     // ==========================================
-    // 2. NAVIGATION & APP LOGIC
+    // 2. APP LOGIC
     // ==========================================
     function navigate(page) { document.querySelectorAll('.page').forEach(p => p.style.display = 'none'); document.getElementById(page).style.display = 'block'; document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); event.currentTarget.classList.add('active'); document.querySelector('.sidebar').classList.remove('open'); window.scrollTo(0, 0); }
 
@@ -253,7 +220,6 @@
     function backToEdit() { document.getElementById('inputCard').style.display = 'block'; document.getElementById('displayCard').style.display = 'none'; document.getElementById('essayInput').value = originalText; }
     function highlightWord(word) { const d = document.getElementById('essayDisplay'); d.innerHTML = d.innerHTML.replace(/<mark class="highlight">(.*?)<\/mark>/gi, '$1'); const r = new RegExp(`(\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b)`, 'gi'); d.innerHTML = d.innerHTML.replace(r, '<mark class="highlight">$1</mark>'); document.getElementById('displayCard').scrollIntoView({behavior:'smooth'}); }
     function analyzeEssay() { const rawText = document.getElementById('essayInput').value.trim(); if (rawText.split(/\s+/).length < 50) return alert("Paste a full essay (50+ words)."); originalText = rawText; document.getElementById('inputCard').style.display = 'none'; document.getElementById('displayCard').style.display = 'block'; document.getElementById('essayDisplay').innerText = rawText; performAnalysis(rawText, ''); document.getElementById('results').style.display = 'block'; document.getElementById('results').scrollIntoView({behavior:'smooth'}); }
-
     function checkThesis() { const t = document.getElementById('tInput').value.trim(); if(!t) return alert("Paste thesis first."); let f = "Thesis Analysis:\n\n"; const w = t.split(/\s+/).length; if(w < 15) { f += "❌ Too short.\n\n"; } else { f += "✅ Good length.\n\n"; } if(t.includes("because") || (t.match(/,/g) || []).length >= 2) { f += "✅ Includes reasons.\n\n"; } else { f += "⚠️ Add reasons.\n\n"; } if(["should", "must", "harmful", "beneficial"].some(x => t.toLowerCase().includes(x))) { f += "✅ Good argument."; } else { f += "❌ Add an argument."; } const b = document.getElementById('thesisResult'); b.innerText = f; b.style.display = 'block'; }
     function checkCitation() { const c = document.getElementById('cInput').value.trim(); const f = document.getElementById('cFormat').value; if(!c) return alert("Paste citation."); let fback = f.toUpperCase()+":\n\n"; if(!c.endsWith('.')) { fback += "❌ Must end with period.\n\n"; } else { fback += "✅ Ends with period.\n\n"; } if(f === 'apa' && !/\(\d{4}\)/.test(c)) { fback += "❌ APA needs (Year).\n\n"; } else { fback += "✅ Looks correct."; } const b = document.getElementById('citationResult'); b.innerText = fback; b.style.display = 'block'; }
     function highlightComplex() { let text = document.getElementById('simpInput').value; const complex = ["utilize", "commence", "terminate", "subsequent", "fabricate", "ascertain", "sufficient", "demonstrate", "indicate", "numerous", "initiate", "attempt", "facilitate", "implement"]; let found = 0; for (const word of complex) { if (new RegExp(`\\b${word}\\b`, 'gi').test(text)) { text = text.replace(new RegExp(`\\b${word}\\b`, 'gi'), `<mark>$&</mark>`); found++; } } if(found === 0) { text = "✅ Great! No complex words."; } else { text += `\n\n⚠️ Replace the ${found} highlighted words.`; } const b = document.getElementById('simpResult'); b.innerHTML = text; b.style.display = 'block'; }
