@@ -3,60 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LexiSuite - The Student Writing OS</title>
+    <title>LexiSuite — Intelligence Tools</title>
     
-    <!-- FIREBASE SDKS -->
+    <!-- PREMIUM TYPOGRAPHY -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;opsz,wght@0..40;400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FIREBASE SDKS (DO NOT DELETE) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <style>
-        :root { --bg: #f4f5f7; --card: #ffffff; --primary: #4f46e5; --primary-hover: #4338ca; --text: #111827; --border: #e5e7eb; --muted: #6b7280; --sidebar-bg: #1f2937; --sidebar-text: #d1d5db; --accent: #10b981; --warning: #f59e0b; --danger: #ef4444; }
+        :root { 
+            --bg: #fafafa; 
+            --card: #ffffff; 
+            --primary: #111111; 
+            --primary-hover: #333333; 
+            --text: #111111; 
+            --border: #e5e5e5; 
+            --muted: #888888; 
+            --sidebar-bg: #111111; 
+            --sidebar-text: #a0a0a0; 
+            --accent: #111111; 
+            --warning: #f59e0b; 
+            --danger: #ef4444;
+            --success-bg: #f0fdf4;
+            --success-text: #166534;
+            --danger-bg: #fef2f2;
+            --danger-text: #991b1b;
+        }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-        .auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .auth-card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        .auth-logo { font-size: 28px; font-weight: 800; margin-bottom: 30px; } .auth-logo span { color: var(--primary); }
-        .google-btn { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: white; cursor: pointer; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; transition: background 0.2s; }
-        .google-btn:hover { background: #f9fafb; }
-        .divider { display: flex; align-items: center; margin-bottom: 20px; color: var(--muted); font-size: 13px; } .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); } .divider span { padding: 0 10px; }
-        .auth-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; font-size: 14px; } .auth-input:focus { outline: none; border-color: var(--primary); }
-        .auth-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 15px; } .auth-btn:hover { background: var(--primary-hover); }
-        .auth-switch { font-size: 13px; color: var(--muted); } .auth-switch u { color: var(--primary); cursor: pointer; font-weight: bold; }
+        /* --- AUTHENTICATION --- */
+        .auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .auth-card { background: white; padding: 60px 50px; width: 100%; max-width: 420px; text-align: center; }
+        .auth-logo { 
+            font-family: 'DM Serif Display', serif; 
+            font-size: 36px; 
+            margin-bottom: 40px; 
+            letter-spacing: -0.02em;
+            color: var(--text); 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 20px; 
+        } 
+        .auth-logo span { font-style: italic; font-weight: 400; }
+        
+        .google-btn { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            background: white; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 500; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+            margin-bottom: 30px; 
+            transition: all 0.2s; 
+        } 
+        .google-btn:hover { background: #f5f5f5; border-color: #ccc; }
+        .divider { display: flex; align-items: center; margin-bottom: 30px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; } 
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); } 
+        .divider span { padding: 0 15px; }
+        .auth-input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            margin-bottom: 16px; 
+            font-size: 15px; 
+            font-family: inherit;
+            background: #fafafa;
+            transition: all 0.2s;
+        } 
+        .auth-input:focus { 
+            outline: none; 
+            border-color: var(--text); 
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+        }
+        .auth-btn { 
+            width: 100%; 
+            padding: 14px; 
+            background: var(--text); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            font-size: 15px; 
+            letter-spacing: 0.02em;
+        } 
+        .auth-btn:hover { background: #333333; }
+        .auth-switch { font-size: 13px; color: var(--muted); } 
+        .auth-switch u { color: var(--text); cursor: pointer; font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px;}
 
+        /* --- LAYOUT --- */
         .app-container { display: none; }
-        .sidebar { width: 250px; background: var(--sidebar-bg); color: var(--sidebar-text); padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; transition: transform 0.3s ease; display: flex; flex-direction: column; }
-        .sidebar-top { flex: 1; }
-        .logo { padding: 0 20px 20px; font-size: 22px; font-weight: 800; color: white; border-bottom: 1px solid #374151; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; } .logo span { color: var(--primary); }
-        .nav-link { display: flex; align-items: center; padding: 12px 20px; color: var(--sidebar-text); text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
-        .nav-link:hover { background: #374151; color: white; } .nav-link.active { background: #374151; color: white; border-left-color: var(--primary); } .nav-link .icon { margin-right: 12px; font-size: 16px; width: 20px; text-align: center; }
+        .sidebar { 
+            width: 260px; 
+            background: var(--sidebar-bg); 
+            color: var(--sidebar-text); 
+            padding: 30px 0; 
+            position: fixed; 
+            height: 100vh; 
+            overflow-y: auto; 
+            z-index: 100; 
+            transition: transform 0.3s ease; 
+            display: flex; 
+            flex-direction: column; 
+            border-right: 1px solid var(--border);
+        }
+        
+        .sidebar-top { flex: 1; padding: 0 20px; }
+        .logo { 
+            font-family: 'DM Serif Display', serif; 
+            font-size: 22px; 
+            font-weight: 400; 
+            color: white; 
+            border-bottom: 1px solid #333; 
+            padding-bottom: 25px; 
+            margin-bottom: 25px; 
+            letter-spacing: -0.02em;
+            cursor: default;
+        } 
+        .logo span { font-style: italic; color: #888; }
+        
+        .nav-link { 
+            display: flex; 
+            align-items: center; 
+            padding: 10px 12px; 
+            margin-bottom: 2px; 
+            color: var(--sidebar-text); 
+            text-decoration: none; 
+            font-size: 14px; 
+            font-weight: 400; 
+            cursor: pointer; 
+            transition: all 0.15s; 
+            border-radius: 8px;
+            border-left: 2px solid transparent;
+        } 
+        .nav-link:hover { 
+            color: #ffffff; 
+            background: rgba(255,255,255,0.05); 
+        } 
+        .nav-link.active { 
+            color: #ffffff; 
+            background: rgba(255,255,255,0.08); 
+            border-left-color: #ffffff; 
+            font-weight: 500;
+        } 
+        .nav-link .icon { 
+            margin-right: 14px; 
+            font-size: 15px; 
+            width: 20px; 
+            text-align: center; 
+            opacity: 0.6;
+        }
 
-        .sidebar-bottom { padding: 20px; border-top: 1px solid #374151; display: flex; align-items: center; gap: 12px; }
-        .avatar-circle { width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
-        .user-info { flex: 1; overflow: hidden; } .user-name { font-size: 14px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .user-email { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; text-decoration: underline; }
+        .sidebar-bottom { 
+            padding: 25px 20px; 
+            border-top: 1px solid #333; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+        .avatar-circle { 
+            width: 34px; 
+            height: 34px; 
+            background: #333; 
+            color: white; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 600; 
+            font-size: 14px; 
+            flex-shrink: 0; 
+            letter-spacing: 0.02em;
+        }
+        .user-info { flex: 1; overflow: hidden; } 
+        .user-name { font-size: 13px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } 
+        .user-email { font-size: 11px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .logout-btn { background: none; border: none; color: #666; cursor: pointer; font-size: 12px; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+        .logout-btn:hover { color: #fff; }
 
-        .main-content { margin-left: 250px; padding: 30px; width: calc(100% - 250px); }
-        .page { display: none; } .page-header { margin-bottom: 30px; } .page-header h1 { font-size: 28px; margin-bottom: 5px; } .page-header p { color: var(--muted); }
-        .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 20px; }
-        .form-group { margin-bottom: 20px; } label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-        input, textarea, select { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; } input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
-        textarea { resize: vertical; min-height: 100px; }
-        .btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: background 0.2s; } .btn:hover { background: var(--primary-hover); } .btn-danger { background: var(--danger); } .btn-danger:hover { background: #dc2626; } .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
-        .result-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-top: 15px; font-family: 'Times New Roman', serif; font-size: 16px; line-height: 1.6; white-space: pre-wrap; display: none; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: var(--bg); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--border); } .stat-num { font-size: 24px; font-weight: 800; color: var(--primary); display: block; } .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); display: block; margin-top: 5px; }
-        .analysis-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .analysis-row { display: flex; align-items: center; justify-content: space-between; background: var(--bg); padding: 12px 16px; border-radius: 8px; border-left: 5px solid #ccc; } .clickable-word { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; font-weight: bold; } .clickable-word:hover { color: var(--primary); } .analysis-sub { font-size: 13px; color: var(--muted); text-align: right; margin-left: 10px; }
-        .status-good { background: #d1e7dd; color: #0f5132; border-left-color: var(--accent) !important; } .status-bad { background: #f8d7da; color: #842029; border-left-color: var(--danger) !important; }
-        .missing-list { list-style: none; padding: 0; } .missing-list li { background: #fff3cd; border-left: 4px solid var(--warning); padding: 12px 15px; margin-bottom: 10px; border-radius: 4px; font-size: 15px; } .missing-list a { color: #856404; text-decoration: underline; cursor: pointer; font-weight: bold; }
-        mark.highlight { background-color: #ffeb3b; color: black; padding: 1px 3px; border-radius: 3px; font-weight: bold; }
-        .flashcard { width: 100%; height: 200px; perspective: 1000px; cursor: pointer; margin-bottom: 20px; } .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; } .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
-        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .flashcard-front { background: var(--primary); color: white; } .flashcard-back { background: var(--accent); color: white; transform: rotateY(180deg); font-size: 18px; font-weight: normal; line-height: 1.4; text-align: left; }
-        .sprint-controls { display: flex; gap: 15px; margin-top: 15px; } .sprint-controls .btn { flex: 1; }
-        .mobile-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 200; background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 8px; font-size: 20px; cursor: pointer; }
-        @media (max-width: 900px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .main-content { margin-left: 0; width: 100%; padding-top: 70px; } .mobile-toggle { display: flex; align-items: center; justify-content: center; } .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+        /* --- MAIN CONTENT --- */
+        .main-content { 
+            margin-left: 260px; 
+            padding: 50px 60px; 
+            width: calc(100% - 260px); 
+            max-width: 1100px;
+        }
+        
+        .page { display: none; } 
+        .page-header { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 20px; } 
+        .page-header h1 { 
+            font-family: 'DM Serif Display', serif; 
+            font-size: 36px; 
+            margin-bottom: 8px; 
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        } 
+        .page-header p { 
+            color: var(--muted); 
+            font-size: 15px; 
+            font-weight: 400;
+        }
+        
+        .card { 
+            background: var(--card); 
+            border-radius: 12px; 
+            padding: 32px; 
+            border: 1px solid var(--border); 
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        
+        .form-group { margin-bottom: 24px; } 
+        label { 
+            display: block; 
+            font-size: 12px; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            font-family: inherit; 
+            font-size: 15px; 
+            background: var(--card);
+        } 
+        input:focus, textarea:focus, select:focus { 
+            outline: none; 
+            border-color: var(--text); 
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+        }
+        textarea { resize: vertical; min-height: 120px; line-height: 1.7; }
+        
+        .btn { 
+            background: var(--text); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-size: 14px; 
+            transition: background 0.2s; 
+            letter-spacing: 0.02em;
+        } 
+        .btn:hover { background: #333333; } 
+        .btn-danger { background: var(--danger); } 
+        .btn-danger:hover { background: #dc2626; } 
+        .btn-secondary { 
+            background: transparent; 
+            color: var(--text); 
+            border: 1px solid var(--border); 
+        }
+        
+        .result-box { 
+            background: var(--bg); 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin-top: 20px; 
+            font-family: 'Inter', sans-serif; 
+            font-size: 15px; 
+            line-height: 1.7; 
+            white-space: pre-wrap; 
+            display: none; 
+        }
+        
+        .grid-4 { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 16px; 
+            margin-bottom: 30px; 
+        }
+        .stat-card { 
+            background: var(--bg); 
+            padding: 20px; 
+            border-radius: 10px; 
+            text-align: center; 
+            border: 1px solid var(--border);
+        } 
+        .stat-num { 
+            font-size: 32px; 
+            font-weight: 700; 
+            color: var(--text); 
+            display: block; 
+            letter-spacing: -0.02em;
+        } 
+        .stat-label { 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1px; 
+            color: var(--muted); 
+            display: block; 
+            margin-top: 6px; 
+        }
+        
+        .analysis-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        .analysis-row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            background: var(--bg); 
+            padding: 14px 18px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+        } 
+        .clickable-word { 
+            cursor: pointer; 
+            text-decoration: underline; 
+            text-decoration-thickness: 1px;
+            text-underline-offset: 3px;
+            font-weight: 600; 
+            color: var(--text);
+        } 
+        .clickable-word:hover { 
+            color: #555; 
+        } 
+        .analysis-sub { 
+            font-size: 13px; 
+            color: var(--muted); 
+            text-align: right; 
+            margin-left: 10px; 
+        }
+        
+        .status-good { 
+            background: var(--success-bg); 
+            color: var(--success-text); 
+            border-color: #bbf7d0;
+        } 
+        .status-bad { 
+            background: var(--danger-bg); 
+            color: var(--danger-text); 
+            border-color: #fecaca;
+        }
+        
+        .missing-list { list-style: none; padding: 0; } 
+        .missing-list li { 
+            background: var(--bg); 
+            border-left: 3px solid var(--text); 
+            padding: 14px 18px; 
+            margin-bottom: 10px; 
+            border-radius: 0 8px 8px 0; 
+            font-size: 14px;
+            color: var(--text);
+        } 
+        .missing-list a { 
+            color: var(--text); 
+            text-decoration: underline; 
+            cursor: pointer; 
+            font-weight: 600; 
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+        }
+        
+        mark.highlight { 
+            background-color: #000; 
+            color: #fff; 
+            padding: 1px 4px; 
+            border-radius: 2px; 
+            font-weight: 500; 
+        }
+        
+        .flashcard { width: 100%; height: 220px; perspective: 1000px; cursor: pointer; margin-bottom: 24px; } 
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; } 
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            backface-visibility: hidden; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 30px;
+            font-size: 22px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .flashcard-front { 
+            background: var(--text); 
+            color: white; 
+            font-weight: 500;
+            border: 1px solid #000;
+        } 
+        .flashcard-back { 
+            background: white; 
+            color: var(--text); 
+            transform: rotateY(180deg); 
+            font-size: 16px; 
+            font-weight: 400; 
+            line-height: 1.6; 
+            text-align: left; 
+            border: 1px solid #000;
+        }
+        
+        .sprint-controls { display: flex; gap: 16px; margin-top: 20px; } 
+        .sprint-controls .btn { flex: 1; }
+        
+        .mobile-toggle { 
+            display: none; 
+            position: fixed; 
+            top: 15px; 
+            left: 15px; 
+            z-index: 200; 
+            background: var(--card); 
+            color: var(--text); 
+            border: 1px solid var(--border); 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 8px; 
+            font-size: 20px; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media (max-width: 900px) { 
+            .sidebar { 
+                transform: translateX(-100%); 
+            } 
+            .sidebar.open { 
+                transform: translateX(0); 
+            } 
+            .main-content { 
+                margin-left: 0; 
+                width: 100%; 
+                padding: 80px 20px 40px 20px; 
+            } 
+            .mobile-toggle { display: flex; } 
+            .grid-4 { grid-template-columns: repeat(2, 1fr); } 
+            .page-header h1 { font-size: 28px; }
+            .main-content { padding-left: 20px; padding-right: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -69,19 +474,19 @@
                 <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                 Continue with Google
             </button>
-            <div class="divider"><span>OR LOGIN WITH EMAIL</span></div>
+            <div class="divider"><span>Or</span></div>
             <input type="email" id="loginEmail" class="auth-input" placeholder="Email address">
             <input type="password" id="loginPass" class="auth-input" placeholder="Password">
-            <button class="auth-btn" onclick="loginUser()">Log In</button>
-            <div class="auth-switch">Don't have an account? <u onclick="showSignup()">Sign Up</u></div>
+            <button class="auth-btn" onclick="loginUser">Log In</button>
+            <div class="auth-switch">Don't have an account? <u onclick="showSignup()">Sign up</u></div>
         </div>
         <div id="signupForm" style="display: none;">
-            <div class="divider"><span>CREATE YOUR ACCOUNT</span></div>
+            <div class="divider"><span>Create account</span></div>
             <input type="text" id="signupName" class="auth-input" placeholder="Full Name">
             <input type="email" id="signupEmail" class="auth-input" placeholder="Email address">
             <input type="password" id="signupPass" class="auth-input" placeholder="Password (min 6 characters)">
             <button class="auth-btn" onclick="signupUser()">Sign Up</button>
-            <div class="auth-switch">Already have an account? <u onclick="showLogin()">Log In</u></div>
+            <div class="auth-switch">Already have an account? <u onclick="showLogin()">Log in</u></div>
         </div>
     </div>
 </div>
@@ -111,40 +516,39 @@
 
     <div class="main-content">
         <div id="home" class="page" style="display: block;">
-            <div class="page-header"><h1>Essay Intelligence Analyzer</h1><p>Paste your essay. Click any underlined word to highlight it.</p></div>
-            <div class="card" id="inputCard"><textarea id="essayInput" placeholder="Paste your entire essay here..." style="min-height: 200px;"></textarea><button class="btn" style="margin-top:15px;" onclick="analyzeEssay()">Analyze Essay</button></div>
-            <div class="card" id="displayCard" style="display: none;"><label><strong>View Mode:</strong></label><div id="essayDisplay" class="result-box" style="display:block; min-height:150px;"></div><button class="btn btn-secondary" style="margin-top:15px;" onclick="backToEdit()">✏️ Back to Edit</button></div>
+            <div class="page-header"><h1>Essay Intelligence</h1><p>Paste your essay. Click any underlined word to highlight it.</p></div>
+            <div class="card" id="inputCard"><textarea id="essayInput" placeholder="Paste your entire essay here..." style="min-height: 220px;"></textarea><button class="btn" style="margin-top:20px;" onclick="analyzeEssay()">Analyze Essay</button></div>
+            <div class="card" id="displayCard" style="display: none;"><label style="color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">View Mode</label><div id="essayDisplay" class="result-box" style="display:block; min-height:180px;"></div><button class="btn btn-secondary" style="margin-top:20px;" onclick="backToEdit()">Back to Edit</button></div>
             <div id="results" style="display:none;">
                 <div class="grid-4"><div class="stat-card"><span class="stat-num" id="wordCount">0</span><span class="stat-label">Words</span></div><div class="stat-card"><span class="stat-num" id="vocabGrade">C</span><span class="stat-label">Vocab</span></div><div class="stat-card"><span class="stat-num" id="readabilityScore">0</span><span class="stat-label">Readability</span></div><div class="stat-card"><span class="stat-num" id="fluffCount">0</span><span class="stat-label">Fluff</span></div></div>
-                <div class="card"><h3>Top Words / Fluff</h3><div id="masterAnalysisList" class="analysis-list"></div></div>
-                <div class="card"><h3>Missing Academic Vocabulary</h3><ul id="missingWords" class="missing-list"></ul></div>
+                <div class="card"><h3 style="font-size: 16px; font-weight: 600; margin-bottom:0;">Analysis</h3><div id="masterAnalysisList" class="analysis-list"></div></div>
+                <div class="card"><h3 style="font-size: 16px; font-weight: 600; margin-bottom:0;">Missing Academic Vocabulary</h3><ul id="missingWords" class="missing-list"></ul></div>
             </div>
         </div>
-        <div id="thesis" class="page"><div class="page-header"><h1>Thesis Checker</h1></div><div class="card"><div class="form-group"><textarea id="tInput" placeholder="Paste your thesis statement here..." style="min-height: 100px;"></textarea></div><button class="btn" onclick="checkThesis()">Check My Thesis</button><div id="thesisResult" class="result-box"></div></div></div>
-        <div id="citation" class="page"><div class="page-header"><h1>Citation Checker</h1></div><div class="card"><div class="form-group"><label>Format:</label><select id="cFormat"><option value="mla">MLA 9</option><option value="apa">APA 7</option></select></div><div class="form-group"><textarea id="cInput" placeholder='Paste your citation here...'></textarea></div><button class="btn" onclick="checkCitation()">Check Citation</button><div id="citationResult" class="result-box"></div></div></div>
-        <div id="simplifier" class="page"><div class="page-header"><h1>Vocabulary Upgrader</h1></div><div class="card"><textarea id="simpInput" placeholder="Paste your text here..."></textarea><button class="btn" style="margin-top:15px;" onclick="highlightComplex()">Highlight Complex Words</button><div id="simpResult" class="result-box"></div></div></div>
-        <div id="glue" class="page"><div class="page-header"><h1>Paragraph Glue Engine</h1></div><div class="card"><div class="form-group"><label>Last sentence of Para 1</label><textarea id="gS1" placeholder="..."></textarea></div><div class="form-group"><label>First sentence of Para 2</label><textarea id="gS2" placeholder="..."></textarea></div><button class="btn" onclick="checkGlue()">Check Connection</button><div id="glueResult" class="result-box"></div></div></div>
+        <div id="thesis" class="page"><div class="page-header"><h1>Thesis Checker</h1></div><div class="card"><div class="form-group"><textarea id="tInput" placeholder="Paste your thesis statement here..." style="min-height: 120px;"></textarea></div><button class="btn" onclick="checkThesis()">Check My Thesis</button><div id="thesisResult" class="result-box"></div></div></div>
+        <div id="citation" class="page"><div class="page-header"><h1>Citation Checker</h1></div><div class="card"><div class="form-group"><label>Format</label><select id="cFormat"><option value="mla">MLA 9</option><option value="apa">APA 7</option></select></div><div class="form-group"><textarea id="cInput" placeholder='Paste your citation here...'></textarea></div><button class="btn" onclick="checkCitation()">Check Citation</button><div id="citationResult" class="result-box"></div></div></div>
+        <div id="simplifier" class="page"><div class="page-header"><h1>Vocabulary Upgrader</h1></div><div class="card"><textarea id="simpInput" placeholder="Paste your text here..."></textarea><button class="btn" style="margin-top:20px;" onclick="highlightComplex()">Highlight Complex Words</button><div id="simpResult" class="result-box"></div></div></div>
+        <div id="glue" class="page"><div class="page-header"><h1>Paragraph Glue</h1></div><div class="card"><div class="form-group"><label>Last sentence of Para 1</label><textarea id="gS1" placeholder="..."></textarea></div><div class="form-group"><label>First sentence of Para 2</label><textarea id="gS2" placeholder="..."></textarea></div><button class="btn" onclick="checkGlue()">Check Connection</button><div id="glueResult" class="result-box"></div></div></div>
         <div id="pomodoro" class="page">
             <div class="page-header"><h1>Writing Sprinter</h1><p>Click Start. Write fast. Click Done to see your speed and grade.</p></div>
             <div class="card">
-                <h2 id="timerDisplay" style="font-size: 48px; font-weight: 800; margin-bottom: 20px; text-align: center; color: var(--muted);">0:00</h2>
+                <h2 id="timerDisplay" style="font-family: 'Inter', sans-serif; font-size: 56px; font-weight: 700; margin-bottom: 24px; text-align: center; color: var(--muted); letter-spacing: -0.04em;">0:00</h2>
                 <textarea id="sprintText" placeholder="Start typing when you click Start..." style="min-height: 200px;" disabled></textarea>
                 <div class="sprint-controls"><button class="btn" id="startBtn" onclick="startSprint()">Start Sprint</button><button class="btn btn-danger" id="doneBtn" onclick="finishSprint()" style="display:none;">Done - Grade Sprint</button></div>
             </div>
-            <!-- FIXED IDS: Changed to lowercase to match JS logic, added missing missingWords list -->
             <span id="sprintwordCount" style="display:none;"></span>
             <div id="sprintResults" style="display:none;">
                 <div class="grid-4">
-                    <div class="stat-card" style="border: 2px solid var(--primary);"><span class="stat-num" id="sprintWPS">0</span><span class="stat-label">Words / Sec</span></div>
+                    <div class="stat-card" style="border: 2px solid var(--text);"><span class="stat-num" id="sprintWPS">0</span><span class="stat-label">Words / Sec</span></div>
                     <div class="stat-card"><span class="stat-num" id="sprintTimeUsed">0:00</span><span class="stat-label">Time Used</span></div>
                     <div class="stat-card"><span class="stat-num" id="sprintvocabGrade">N/A</span><span class="stat-label">Vocab</span></div>
                     <div class="stat-card"><span class="stat-num" id="sprintfluffCount">0</span><span class="stat-label">Fluff</span></div>
                 </div>
-                <div class="card"><h3>Sprint Grammar Analysis</h3><div id="sprintmasterAnalysisList" class="analysis-list"></div></div>
-                <div class="card"><h3>Missing Sprint Vocabulary</h3><ul id="sprintmissingWords" class="missing-list"></ul></div>
+                <div class="card"><h3 style="font-size: 16px; font-weight: 600; margin-bottom:0;">Sprint Grammar Analysis</h3><div id="sprintmasterAnalysisList" class="analysis-list"></div></div>
+                <div class="card"><h3 style="font-size: 16px; font-weight: 600; margin-bottom:0;">Missing Sprint Vocabulary</h3><ul id="sprintmissingWords" class="missing-list"></ul></div>
             </div>
         </div>
-        <div id="flashcards" class="page"><div class="page-header"><h1>Grammar Trap Flashcards</h1></div><div class="card" style="display:flex; flex-direction:column; align-items:center;"><div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front" id="fcFront">Their, There, or They're?</div><div class="flashcard-back" id="fcBack">Their = Possession. There = Place. They're = They are.</div></div></div><button class="btn btn-secondary" onclick="nextCard()">Next Card →</button></div></div>
+        <div id="flashcards" class="page"><div class="page-header"><h1>Grammar Flashcards</h1></div><div class="card" style="display:flex; flex-direction:column; align-items:center;"><div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front" id="fcFront">Their, There, or They're?</div><div class="flashcard-back" id="fcBack">Their = Possession. There = Place. They're = They are.</div></div></div><button class="btn btn-secondary" onclick="nextCard()">Next Card →</button></div></div>
     </div>
 </div>
 
@@ -197,55 +601,19 @@ apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
     function performAnalysis(rawText, prefix = '') {
         const words = rawText.toLowerCase().replace(/[^a-z\s']/g, '').split(/\s+/).filter(w => w.length > 0);
         const sent = rawText.split(/[.!?]+/).filter(s => s.trim().length > 0);
-        const totalWords = words.length;
-        
+        const totalWords = length;
         document.getElementById(prefix + 'wordCount').innerText = totalWords;
-        
-        if (totalWords === 0) { 
-            document.getElementById(prefix + 'vocabGrade').innerText = 'N/A'; 
-            if(prefix === '') document.getElementById('readabilityScore').innerText = 'N/A'; 
-            document.getElementById(prefix + 'fluffCount').innerText = 0; 
-            document.getElementById(prefix + 'masterAnalysisList').innerHTML = '<p style="color:var(--muted)">Not enough text to grade.</p>'; 
-            document.getElementById(prefix + 'missingWords').innerHTML = ''; 
-            return; 
-        }
-        
+        if (totalWords === 0) { document.getElementById(prefix + 'vocabGrade').innerText = 'N/A'; if(prefix === '') document.getElementById('readabilityScore').innerText = 'N/A'; document.getElementById(prefix + 'fluffCount').innerText = 0; document.getElementById(prefix + 'masterAnalysisList').innerHTML = '<p style="color:var(--muted)">Not enough text to grade.</p>'; document.getElementById(prefix + 'missingWords').innerHTML = ''; return; }
         const avg = (words.reduce((a,w)=>a+w.length,0)/totalWords).toFixed(1);
         document.getElementById(prefix + 'vocabGrade').innerText = avg >= 5 ? "A" : avg >= 4.5 ? "B" : "C";
-        
-        if(prefix === '') { 
-            const syl = words.reduce((a,w)=>a+(w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '').match(/[aeiouy]{1,2}/g) || []).length, 0); 
-            let fk = sent.length > 0 ? (0.39*(totalWords/sent.length)+11.8*(syl/totalWords)-15.59).toFixed(0) : 0; 
-            document.getElementById('readabilityScore').innerText = fk+"th"; 
-        }
-        
-        let list = ''; 
-        const freq = {}; 
-        words.filter(w=>!stopWords.has(w)&&w.length>2).forEach(w=>{freq[w]=(freq[w]||0)+1;});
-        
-        Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5).forEach(([w,c])=>{ 
-            const bad = badWords.has(w); 
-            const clickAction = prefix === 'sprint' ? `alert('You used "${w}" ${c} times. Change it!')` : `highlightWord('${w}')`; 
-            list += `<div class="analysis-row ${bad?'status-bad':'status-good'}"><span class="clickable-word" onclick="${clickAction}">${w}</span><span class="analysis-sub">${c} times</span></div>`; 
-        });
-        
-        let fluffC=0; 
-        for(const [f,r] of Object.entries(fluffDict)){
-            if(rawText.toLowerCase().includes(f)){ 
-                fluffC++; 
-                const clickAction = prefix === 'sprint' ? `alert('Change "${f}" to "${r}"')` : `highlightWord('${f}', true)`; 
-                list += `<div class="analysis-row status-bad"><span class="clickable-word" onclick="${clickAction}">"${f}"</span><span class="analysis-sub">Use "${r}"</span></div>`; 
-            } 
-        }
-        
+        if(prefix === '') { const syl = words.reduce((a,w)=>a+(w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '').match(/[aeiouy]{1,2}/g) || []).length, 0); let fk = sent.length > 0 ? (0.39*(totalWords/sent.length)+11.8*(syl/totalWords)-15.59).toFixed(0) : 0; document.getElementById('readabilityScore').innerText = fk+"th"; }
+        let list = ''; const freq = {}; words.filter(w=>!stopWords.has(w)&&w.length>2).forEach(w=>{freq[w]=(freq[w]||0)+1;});
+        Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5).forEach(([w,c])=>{ const bad = badWords.has(w); const clickAction = prefix === 'sprint' ? `alert('You used "${w}" ${c} times. Change it!')` : `highlightWord('${w}')`; list += `<div class="analysis-row ${bad?'status-bad':'status-good'}"><span class="clickable-word" onclick="${clickAction}">${w}</span><span class="analysis-sub">${c} times</span></div>`; });
+        let fluffC=0; for(const [f,r] of Object.entries(fluffDict)){ if(rawText.toLowerCase().includes(f)){ fluffC++; const clickAction = prefix === 'sprint' ? `alert('Change "${f}" to "${r}"')` : `highlightWord('${f}', true)`; list += `<div class="analysis-row status-bad"><span class="clickable-word" onclick="${clickAction}">"${f}"</span><span class="analysis-sub">Change to "${r}"</span></div>`; } }
         document.getElementById(prefix + 'fluffCount').innerText = fluffC; 
-        document.getElementById(prefix + 'masterAnalysisList').innerHTML = list || '<p style="color:var(--accent)">Perfect! No issues found.</p>';
-        
-        let mis = ''; 
-        academicPowerWords.forEach(w=>{ 
-            if(!new RegExp(`\\b${w}\\b`,'i').test(rawText)) mis += `<li>Try using "<a href="https://www.google.com/search?q=meaning+of+${w}" target="_blank">${w}</a>" to sound smarter.</li>`; 
-        });
-        document.getElementById(prefix + 'missingWords').innerHTML = mis || '<li style="color:green; background:none; border:none;">✅ Excellent academic vocabulary used.</li>';
+        document.getElementById(prefix + 'masterAnalysisList').innerHTML = list || '<p style="color:var(--muted)">Perfect. No issues found.</p>';
+        let mis = ''; academicPowerWords.forEach(w=>{ if(!new RegExp(`\\b${w}\\b`,'i').test(rawText)) mis += `<li>Try using "<a href="https://www.google.com/search?q=meaning+of+${w}" target="_blank">${w}</a>" to sound smarter.</li>`; });
+        document.getElementById(prefix + 'missingWords').innerHTML = mis || '<li style="color:var(--muted); background:none; border:none; padding:0;">✓ Excellent academic vocabulary used.</li>';
     }
 
     let originalText = "";
@@ -254,8 +622,8 @@ apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
     function analyzeEssay() { const rawText = document.getElementById('essayInput').value.trim(); if (rawText.split(/\s+/).length < 50) return alert("Paste a full essay (50+ words)."); originalText = rawText; document.getElementById('inputCard').style.display = 'none'; document.getElementById('displayCard').style.display = 'block'; document.getElementById('essayDisplay').innerText = rawText; performAnalysis(rawText, ''); document.getElementById('results').style.display = 'block'; document.getElementById('results').scrollIntoView({behavior:'smooth'}); }
     function checkThesis() { const t = document.getElementById('tInput').value.trim(); if(!t) return alert("Paste thesis first."); let f = "Thesis Analysis:\n\n"; const w = t.split(/\s+/).length; if(w < 15) { f += "❌ Too short.\n\n"; } else { f += "✅ Good length.\n\n"; } if(t.includes("because") || (t.match(/,/g) || []).length >= 2) { f += "✅ Includes reasons.\n\n"; } else { f += "⚠️ Add reasons.\n\n"; } if(["should", "must", "harmful", "beneficial"].some(x => t.toLowerCase().includes(x))) { f += "✅ Good argument."; } else { f += "❌ Add an argument."; } const b = document.getElementById('thesisResult'); b.innerText = f; b.style.display = 'block'; }
     function checkCitation() { const c = document.getElementById('cInput').value.trim(); const f = document.getElementById('cFormat').value; if(!c) return alert("Paste citation."); let fback = f.toUpperCase()+":\n\n"; if(!c.endsWith('.')) { fback += "❌ Must end with period.\n\n"; } else { fback += "✅ Ends with period.\n\n"; } if(f === 'apa' && !/\(\d{4}\)/.test(c)) { fback += "❌ APA needs (Year).\n\n"; } else { fback += "✅ Looks correct."; } const b = document.getElementById('citationResult'); b.innerText = fback; b.style.display = 'block'; }
-    function highlightComplex() { let text = document.getElementById('simpInput').value; const complex = ["utilize", "commence", "terminate", "subsequent", "fabricate", "ascertain", "sufficient", "demonstrate", "indicate", "numerous", "initiate", "attempt", "facilitate", "implement"]; let found = 0; for (const word of complex) { if (new RegExp(`\\b${word}\\b`, 'gi').test(text)) { text = text.replace(new RegExp(`\\b${word}\\b`, 'gi'), `<mark>$&</mark>`); found++; } } if(found === 0) { text = "✅ Great! No complex words."; } else { text += `\n\n⚠️ Replace the ${found} highlighted words.`; } const b = document.getElementById('simpResult'); b.innerHTML = text; b.style.display = 'block'; }
-    function checkGlue() { const s1 = document.getElementById('gS1').value.toLowerCase(), s2 = document.getElementById('gS2').value.toLowerCase(); const w = s1.split(/\s+/).filter(w => w.length > 4 && !stopWords.has(w)); let m = false, mw = ""; for(let x of w) { if(s2.includes(x)) { m = true; mw = x; break; } } const r = m ? `✅ Good connection: "${mw}".` : "❌ Poor connection. Add a transition."; const b = document.getElementById('glueResult'); b.innerText = r; b.style.display = 'block'; }
+    function highlightComplex() { let text = document.getElementById('simpInput').value; const complex = ["utilize", "commence", "terminate", "subsequent", "fabricate", "ascertain", "sufficient", "demonstrate", "indicate", "numerous", "initiate", "attempt", "facilitate", "implement"]; let found = 0; for (const word of complex) { if (new RegExp(`\\b${word}\\b`, 'gi').test(text)) { text = text.replace(new RegExp(`\\b${word}\\b`, 'gi'), `<mark>$&</mark>`); found++; } } if(found === 0) { text = "✓ Great! No complex words."; } else { text += `\n\n⚠️ Replace the ${found} highlighted words.`; } const b = document.getElementById('simpResult'); b.innerHTML = text; b.style.display = 'block'; }
+    function checkGlue() { const s1 = document.getElementById('gS1').value.toLowerCase(), s2 = document.getElementById('gS2').value.toLowerCase(); const w = s1.split(/\s+/).filter(w => w.length > 4 && !stopWords.has(w)); let m = false, mw = ""; for(let x of w) { if(s2.includes(x)) { m = true; mw = x; break; } } const r = m ? `✓ Good connection: "${mw}".` : "❌ Poor connection. Add a transition."; const b = document.getElementById('glueResult'); b.innerText = r; b.style.display = 'block'; }
 
     let sprintInterval; let sprintSeconds = 0; let isSprinting = false;
     function startSprint() { 
@@ -265,7 +633,7 @@ apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
         document.getElementById('sprintText').focus(); 
         document.getElementById('startBtn').style.display = 'none'; 
         document.getElementById('doneBtn').style.display = 'block'; 
-        document.getElementById('timerDisplay').style.color = 'var(--primary)'; 
+        document.getElementById('timerDisplay').style.color = 'var(--text)'; 
         document.getElementById('sprintResults').style.display = 'none'; 
         
         sprintInterval = setInterval(() => { 
@@ -282,7 +650,7 @@ apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
         isSprinting = false; 
         document.getElementById('sprintText').disabled = true; 
         document.getElementById('doneBtn').disabled = true; 
-        document.getElementById('timerDisplay').style.color = 'var(--danger)'; 
+        document.getElementById('timerDisplay').style.color = 'var(--muted)'; 
         
         const rawText = document.getElementById('sprintText').value.trim(); 
         const totalWords = rawText.split(/\s+/).filter(w => w.length > 0).length; 
@@ -291,10 +659,8 @@ apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
         let s = sprintSeconds%60; 
         document.getElementById('sprintTimeUsed').innerText = `${m}:${s.toString().padStart(2,'0')}`; 
         
-        // Calculate WPS safely
         document.getElementById('sprintWPS').innerText = sprintSeconds > 0 ? (totalWords / sprintSeconds).toFixed(2) : 0; 
         
-        // Run the grading engine
         performAnalysis(rawText, 'sprint'); 
         
         document.getElementById('sprintResults').style.display = 'block'; 
