@@ -131,9 +131,17 @@
                 <textarea id="sprintText" placeholder="Start typing when you click Start..." style="min-height: 200px;" disabled></textarea>
                 <div class="sprint-controls"><button class="btn" id="startBtn" onclick="startSprint()">Start Sprint</button><button class="btn btn-danger" id="doneBtn" onclick="finishSprint()" style="display:none;">Done - Grade Sprint</button></div>
             </div>
+            <!-- FIXED IDS: Changed to lowercase to match JS logic, added missing missingWords list -->
+            <span id="sprintwordCount" style="display:none;"></span>
             <div id="sprintResults" style="display:none;">
-                <div class="grid-4"><div class="stat-card" style="border: 2px solid var(--primary);"><span class="stat-num" id="sprintWPS">0</span><span class="stat-label">Words / Sec</span></div><div class="stat-card"><span class="stat-num" id="sprintTimeUsed">0:00</span><span class="stat-label">Time Used</span></div><div class="stat-card"><span class="stat-num" id="sprintVocabGrade">N/A</span><span class="stat-label">Vocab</span></div><div class="stat-card"><span class="stat-num" id="sprintFluffCount">0</span><span class="stat-label">Fluff</span></div></div>
-                <div class="card"><h3>Sprint Grammar</h3><div id="sprintMasterAnalysisList" class="analysis-list"></div></div>
+                <div class="grid-4">
+                    <div class="stat-card" style="border: 2px solid var(--primary);"><span class="stat-num" id="sprintWPS">0</span><span class="stat-label">Words / Sec</span></div>
+                    <div class="stat-card"><span class="stat-num" id="sprintTimeUsed">0:00</span><span class="stat-label">Time Used</span></div>
+                    <div class="stat-card"><span class="stat-num" id="sprintvocabGrade">N/A</span><span class="stat-label">Vocab</span></div>
+                    <div class="stat-card"><span class="stat-num" id="sprintfluffCount">0</span><span class="stat-label">Fluff</span></div>
+                </div>
+                <div class="card"><h3>Sprint Grammar Analysis</h3><div id="sprintmasterAnalysisList" class="analysis-list"></div></div>
+                <div class="card"><h3>Missing Sprint Vocabulary</h3><ul id="sprintmissingWords" class="missing-list"></ul></div>
             </div>
         </div>
         <div id="flashcards" class="page"><div class="page-header"><h1>Grammar Trap Flashcards</h1></div><div class="card" style="display:flex; flex-direction:column; align-items:center;"><div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="flashcard-front" id="fcFront">Their, There, or They're?</div><div class="flashcard-back" id="fcBack">Their = Possession. There = Place. They're = They are.</div></div></div><button class="btn btn-secondary" onclick="nextCard()">Next Card →</button></div></div>
@@ -145,7 +153,7 @@
     // 1. FIREBASE GOOGLE AUTH SETUP
     // ==========================================
     const firebaseConfig = {
-  apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
+apiKey: "AIzaSyDbV9HXcrx0gAuIpTqFFxtRju-YoscavGU",
   authDomain: "lexisute.firebaseapp.com",
   projectId: "lexisute",
   storageBucket: "lexisute.firebasestorage.app",
@@ -190,17 +198,54 @@
         const words = rawText.toLowerCase().replace(/[^a-z\s']/g, '').split(/\s+/).filter(w => w.length > 0);
         const sent = rawText.split(/[.!?]+/).filter(s => s.trim().length > 0);
         const totalWords = words.length;
+        
         document.getElementById(prefix + 'wordCount').innerText = totalWords;
-        if (totalWords === 0) { document.getElementById(prefix + 'vocabGrade').innerText = 'N/A'; if(prefix === '') document.getElementById('readabilityScore').innerText = 'N/A'; document.getElementById(prefix + 'fluffCount').innerText = 0; document.getElementById(prefix + 'masterAnalysisList').innerHTML = '<p style="color:var(--muted)">Not enough text.</p>'; document.getElementById(prefix + 'missingWords').innerHTML = ''; return; }
+        
+        if (totalWords === 0) { 
+            document.getElementById(prefix + 'vocabGrade').innerText = 'N/A'; 
+            if(prefix === '') document.getElementById('readabilityScore').innerText = 'N/A'; 
+            document.getElementById(prefix + 'fluffCount').innerText = 0; 
+            document.getElementById(prefix + 'masterAnalysisList').innerHTML = '<p style="color:var(--muted)">Not enough text to grade.</p>'; 
+            document.getElementById(prefix + 'missingWords').innerHTML = ''; 
+            return; 
+        }
+        
         const avg = (words.reduce((a,w)=>a+w.length,0)/totalWords).toFixed(1);
         document.getElementById(prefix + 'vocabGrade').innerText = avg >= 5 ? "A" : avg >= 4.5 ? "B" : "C";
-        if(prefix === '') { const syl = words.reduce((a,w)=>a+(w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '').match(/[aeiouy]{1,2}/g) || []).length, 0); let fk = sent.length > 0 ? (0.39*(totalWords/sent.length)+11.8*(syl/totalWords)-15.59).toFixed(0) : 0; document.getElementById('readabilityScore').innerText = fk+"th"; }
-        let list = ''; const freq = {}; words.filter(w=>!stopWords.has(w)&&w.length>2).forEach(w=>{freq[w]=(freq[w]||0)+1;});
-        Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5).forEach(([w,c])=>{ const bad = badWords.has(w); const clickAction = prefix === 'sprint' ? `alert('Used "${w}" ${c} times.')` : `highlightWord('${w}')`; list += `<div class="analysis-row ${bad?'status-bad':'status-good'}"><span class="clickable-word" onclick="${clickAction}">${w}</span><span class="analysis-sub">${c} times</span></div>`; });
-        let fluffC=0; for(const [f,r] of Object.entries(fluffDict)){ if(rawText.toLowerCase().includes(f)){ fluffC++; const clickAction = prefix === 'sprint' ? `alert('Change "${f}" to "${r}"')` : `highlightWord('${f}', true)`; list += `<div class="analysis-row status-bad"><span class="clickable-word" onclick="${clickAction}">"${f}"</span><span class="analysis-sub">Use "${r}"</span></div>`; } }
-        document.getElementById(prefix + 'fluffCount').innerText = fluffC; document.getElementById(prefix + 'masterAnalysisList').innerHTML = list || '<p>No issues found.</p>';
-        let mis = ''; academicPowerWords.forEach(w=>{ if(!new RegExp(`\\b${w}\\b`,'i').test(rawText)) mis += `<li>Try "<a href="https://www.google.com/search?q=meaning+of+${w}" target="_blank">${w}</a>"</li>`; });
-        document.getElementById(prefix + 'missingWords').innerHTML = mis || '<li style="color:green; background:none; border:none;">✅ Excellent vocabulary.</li>';
+        
+        if(prefix === '') { 
+            const syl = words.reduce((a,w)=>a+(w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '').match(/[aeiouy]{1,2}/g) || []).length, 0); 
+            let fk = sent.length > 0 ? (0.39*(totalWords/sent.length)+11.8*(syl/totalWords)-15.59).toFixed(0) : 0; 
+            document.getElementById('readabilityScore').innerText = fk+"th"; 
+        }
+        
+        let list = ''; 
+        const freq = {}; 
+        words.filter(w=>!stopWords.has(w)&&w.length>2).forEach(w=>{freq[w]=(freq[w]||0)+1;});
+        
+        Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,5).forEach(([w,c])=>{ 
+            const bad = badWords.has(w); 
+            const clickAction = prefix === 'sprint' ? `alert('You used "${w}" ${c} times. Change it!')` : `highlightWord('${w}')`; 
+            list += `<div class="analysis-row ${bad?'status-bad':'status-good'}"><span class="clickable-word" onclick="${clickAction}">${w}</span><span class="analysis-sub">${c} times</span></div>`; 
+        });
+        
+        let fluffC=0; 
+        for(const [f,r] of Object.entries(fluffDict)){
+            if(rawText.toLowerCase().includes(f)){ 
+                fluffC++; 
+                const clickAction = prefix === 'sprint' ? `alert('Change "${f}" to "${r}"')` : `highlightWord('${f}', true)`; 
+                list += `<div class="analysis-row status-bad"><span class="clickable-word" onclick="${clickAction}">"${f}"</span><span class="analysis-sub">Use "${r}"</span></div>`; 
+            } 
+        }
+        
+        document.getElementById(prefix + 'fluffCount').innerText = fluffC; 
+        document.getElementById(prefix + 'masterAnalysisList').innerHTML = list || '<p style="color:var(--accent)">Perfect! No issues found.</p>';
+        
+        let mis = ''; 
+        academicPowerWords.forEach(w=>{ 
+            if(!new RegExp(`\\b${w}\\b`,'i').test(rawText)) mis += `<li>Try using "<a href="https://www.google.com/search?q=meaning+of+${w}" target="_blank">${w}</a>" to sound smarter.</li>`; 
+        });
+        document.getElementById(prefix + 'missingWords').innerHTML = mis || '<li style="color:green; background:none; border:none;">✅ Excellent academic vocabulary used.</li>';
     }
 
     let originalText = "";
@@ -213,8 +258,48 @@
     function checkGlue() { const s1 = document.getElementById('gS1').value.toLowerCase(), s2 = document.getElementById('gS2').value.toLowerCase(); const w = s1.split(/\s+/).filter(w => w.length > 4 && !stopWords.has(w)); let m = false, mw = ""; for(let x of w) { if(s2.includes(x)) { m = true; mw = x; break; } } const r = m ? `✅ Good connection: "${mw}".` : "❌ Poor connection. Add a transition."; const b = document.getElementById('glueResult'); b.innerText = r; b.style.display = 'block'; }
 
     let sprintInterval; let sprintSeconds = 0; let isSprinting = false;
-    function startSprint() { if(isSprinting) return; isSprinting = true; document.getElementById('sprintText').disabled = false; document.getElementById('sprintText').focus(); document.getElementById('startBtn').style.display = 'none'; document.getElementById('doneBtn').style.display = 'block'; document.getElementById('timerDisplay').style.color = 'var(--primary)'; document.getElementById('sprintResults').style.display = 'none'; sprintInterval = setInterval(() => { sprintSeconds++; if(sprintSeconds >= 900) { finishSprint(); return; } let m = Math.floor(sprintSeconds/60); let s = sprintSeconds%60; document.getElementById('timerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; }, 1000); }
-    function finishSprint() { clearInterval(sprintInterval); isSprinting = false; document.getElementById('sprintText').disabled = true; document.getElementById('doneBtn').disabled = true; document.getElementById('timerDisplay').style.color = 'var(--danger)'; const rawText = document.getElementById('sprintText').value.trim(); const totalWords = rawText.split(/\s+/).filter(w => w.length > 0).length; let m = Math.floor(sprintSeconds/60); let s = sprintSeconds%60; document.getElementById('sprintTimeUsed').innerText = `${m}:${s.toString().padStart(2,'0')}`; document.getElementById('sprintWPS').innerText = sprintSeconds > 0 ? (totalWords / sprintSeconds).toFixed(2) : 0; performAnalysis(rawText, 'sprint'); document.getElementById('sprintResults').style.display = 'block'; document.getElementById('sprintResults').scrollIntoView({behavior:'smooth'}); }
+    function startSprint() { 
+        if(isSprinting) return; 
+        isSprinting = true; 
+        document.getElementById('sprintText').disabled = false; 
+        document.getElementById('sprintText').focus(); 
+        document.getElementById('startBtn').style.display = 'none'; 
+        document.getElementById('doneBtn').style.display = 'block'; 
+        document.getElementById('timerDisplay').style.color = 'var(--primary)'; 
+        document.getElementById('sprintResults').style.display = 'none'; 
+        
+        sprintInterval = setInterval(() => { 
+            sprintSeconds++; 
+            if(sprintSeconds >= 900) { finishSprint(); return; } 
+            let m = Math.floor(sprintSeconds/60); 
+            let s = sprintSeconds%60; 
+            document.getElementById('timerDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; 
+        }, 1000); 
+    }
+    
+    function finishSprint() { 
+        clearInterval(sprintInterval); 
+        isSprinting = false; 
+        document.getElementById('sprintText').disabled = true; 
+        document.getElementById('doneBtn').disabled = true; 
+        document.getElementById('timerDisplay').style.color = 'var(--danger)'; 
+        
+        const rawText = document.getElementById('sprintText').value.trim(); 
+        const totalWords = rawText.split(/\s+/).filter(w => w.length > 0).length; 
+        
+        let m = Math.floor(sprintSeconds/60); 
+        let s = sprintSeconds%60; 
+        document.getElementById('sprintTimeUsed').innerText = `${m}:${s.toString().padStart(2,'0')}`; 
+        
+        // Calculate WPS safely
+        document.getElementById('sprintWPS').innerText = sprintSeconds > 0 ? (totalWords / sprintSeconds).toFixed(2) : 0; 
+        
+        // Run the grading engine
+        performAnalysis(rawText, 'sprint'); 
+        
+        document.getElementById('sprintResults').style.display = 'block'; 
+        document.getElementById('sprintResults').scrollIntoView({behavior:'smooth'}); 
+    }
 
     const cards = [{f:"Their, There, or They're?", b:"Their = Possession. There = Place. They're = They are."},{f:"Your vs. You're", b:"Your = Possession. You're = You are."},{f:"Its vs. It's", b:"Its = Possession. It's = It is."},{f:"Effect vs. Affect", b:"Effect = Noun. Affect = Verb."},{f:"Then vs. Than", b:"Then = Time. Than = Comparison."}];
     let cardIndex = 0;
